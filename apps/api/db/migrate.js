@@ -17,9 +17,22 @@ const runSeed = process.argv.includes('--seed');
 const MIGRATIONS_DIR = path.join(__dirname, '../../..', 'db', 'migrations');
 const SEEDS_DIR = path.join(__dirname, '../../..', 'db', 'seeds');
 
+function getSanitizedDatabaseUrl() {
+  const rawUrl = process.env.DATABASE_URL;
+  if (!rawUrl) {
+    throw new Error('DATABASE_URL não configurada');
+  }
+
+  const parsed = new URL(rawUrl);
+  // mysql2 não reconhece `ssl-mode` (warning atual, erro futuro)
+  parsed.searchParams.delete('ssl-mode');
+  parsed.searchParams.delete('sslmode');
+  return parsed.toString();
+}
+
 async function getConnection() {
   return mysql.createConnection({
-    uri: process.env.DATABASE_URL,
+    uri: getSanitizedDatabaseUrl(),
     multipleStatements: true,
     ...(isProduction && { ssl: { rejectUnauthorized: false } }),
   });

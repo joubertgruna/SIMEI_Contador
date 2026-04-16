@@ -2,8 +2,21 @@ const mysql = require('mysql2/promise');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+function getSanitizedDatabaseUrl() {
+  const rawUrl = process.env.DATABASE_URL;
+  if (!rawUrl) {
+    throw new Error('DATABASE_URL não configurada');
+  }
+
+  const parsed = new URL(rawUrl);
+  // mysql2 não reconhece `ssl-mode` (warning atual, erro futuro)
+  parsed.searchParams.delete('ssl-mode');
+  parsed.searchParams.delete('sslmode');
+  return parsed.toString();
+}
+
 const pool = mysql.createPool({
-  uri: process.env.DATABASE_URL,
+  uri: getSanitizedDatabaseUrl(),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
