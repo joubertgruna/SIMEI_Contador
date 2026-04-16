@@ -10,7 +10,7 @@ const router = express.Router();
  * Login de usuário
  */
 router.post('/login', [
-  body('email').isEmail().withMessage('Email inválido'),
+  body('email').trim().normalizeEmail().isEmail().withMessage('Email inválido'),
   body('senha').notEmpty().withMessage('Senha é obrigatória')
 ], async (req, res, next) => {
   try {
@@ -67,7 +67,7 @@ router.post('/logout', auth, async (req, res, next) => {
  */
 router.post('/register', [
   body('nome').notEmpty().withMessage('Nome é obrigatório'),
-  body('email').isEmail().withMessage('Email inválido'),
+  body('email').trim().normalizeEmail().isEmail().withMessage('Email inválido'),
   body('senha').isLength({ min: 6 }).withMessage('Senha deve ter no mínimo 6 caracteres'),
   body('role').optional().isIn(['empresa', 'admin', 'super_usuario'])
 ], async (req, res, next) => {

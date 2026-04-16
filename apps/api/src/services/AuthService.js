@@ -11,9 +11,11 @@ class AuthService {
    * @returns {Promise<{user: object, accessToken: string, refreshToken: string}>}
    */
   async login(email, senha) {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+
     const [user] = await query(
       'SELECT * FROM usuarios WHERE email = ? AND deleted_at IS NULL',
-      [email]
+      [normalizedEmail]
     );
 
     if (!user) {
@@ -87,7 +89,9 @@ class AuthService {
    * @returns {Promise<object>}
    */
   async createUser({ nome, email, senha, role, empresa_id }) {
-    const [existing] = await query('SELECT id FROM usuarios WHERE email = ?', [email]);
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+
+    const [existing] = await query('SELECT id FROM usuarios WHERE email = ?', [normalizedEmail]);
     if (existing) {
       throw ApiError.conflict('Email já cadastrado');
     }
@@ -97,10 +101,10 @@ class AuthService {
     const result = await query(
       `INSERT INTO usuarios (nome, email, senha_hash, role, empresa_id, created_at) 
        VALUES (?, ?, ?, ?, ?, NOW())`,
-      [nome, email, senhaHash, role || 'empresa', empresa_id]
+      [nome, normalizedEmail, senhaHash, role || 'empresa', empresa_id]
     );
 
-    return { id: result.insertId, nome, email, role: role || 'empresa' };
+    return { id: result.insertId, nome, email: normalizedEmail, role: role || 'empresa' };
   }
 
   generateAccessToken(user) {
