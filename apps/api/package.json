@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "build": "echo \"API sem etapa de build (Node.js runtime)\"",
+    "build": "node db/migrate.js",
     "start": "node src/index.js",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
