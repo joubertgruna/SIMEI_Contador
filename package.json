@@ -1,0 +1,26 @@
+{
+  "name": "simei-contador",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema de contabilidade para empresas no Simples Nacional",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "docker-compose up",
+    "dev:web": "npm run dev -w web",
+    "dev:api": "npm run dev -w api",
+    "build": "npm run build -w web",
+    "test": "npm run test --workspaces --if-present",
+    "db:migrate": "npm run db:migrate -w api",
+    "db:seed": "npm run db:seed -w api",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "SIMEI Contador",
+  "license": "MIT"
+}
