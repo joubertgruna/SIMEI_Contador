@@ -161,7 +161,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const updateProfile = async (data: Partial<User>) => {
-    if (!state.user) return;
+    if (!state.user) {
+      dispatch({ type: 'SET_ERROR', payload: 'Usuário não autenticado' });
+      return;
+    }
 
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'CLEAR_ERROR' });
@@ -178,6 +181,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Erro ao atualizar perfil';
       dispatch({ type: 'SET_ERROR', payload: errorMessage });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   };
 

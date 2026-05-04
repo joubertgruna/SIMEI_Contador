@@ -10,10 +10,20 @@ const Profile: React.FC = () => {
 
   // Redirecionar se não estiver logado
   React.useEffect(() => {
-    if (!state.isAuthenticated) {
+    if (!state.loading && !state.isAuthenticated) {
       navigate('/login');
     }
-  }, [state.isAuthenticated, navigate]);
+  }, [state.loading, state.isAuthenticated, navigate]);
+
+  if (state.loading) {
+    return (
+      <Container maxWidth="sm">
+        <Box sx={{ mt: 8, textAlign: 'center' }}>
+          <Typography color="text.secondary">Carregando perfil...</Typography>
+        </Box>
+      </Container>
+    );
+  }
 
   const handleLogout = () => {
     logout();
