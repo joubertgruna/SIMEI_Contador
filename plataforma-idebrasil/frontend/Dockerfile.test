@@ -1,0 +1,21 @@
+# Temporary Dockerfile for CI-like verification
+FROM node:20-bullseye AS test
+
+WORKDIR /app
+
+# Copy package files first for layer caching
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install --no-audit --no-fund
+
+# Copy rest of the source
+COPY . .
+
+# Run lint, tests and build
+RUN npm run lint
+RUN CI=true npm test -- --watchAll=false
+RUN npm run build
+
+# If we reach here, all steps passed
+CMD ["/bin/true"]

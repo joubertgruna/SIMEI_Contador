@@ -1,0 +1,40 @@
+ # yamllint disable=truthy
+---
+name: CI - Quiet (TEST_MUI_MOCKS)
+on:
+  workflow_dispatch: {}
+
+jobs:
+  frontend-quiet:
+    name: Frontend quiet tests and build (opt-in)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: plataforma-idebrasil/frontend
+    env:
+      # Increase memory for builds/tests in this opt-in workflow.
+      NODE_OPTIONS: "--max_old_space_size=4096"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests with TEST_MUI_MOCKS
+        env:
+          CI: true
+          TEST_MUI_MOCKS: true
+        run: npm test -- --watchAll=false --silent
+
+      - name: Build
+        run: npm run build

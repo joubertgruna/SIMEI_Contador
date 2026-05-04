@@ -1,0 +1,51 @@
+ # yamllint disable=truthy
+---
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  frontend:
+    name: Frontend tests and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: plataforma-idebrasil/frontend
+    env:
+      # Increase memory for builds/tests and suppress noisy deprecation
+      # warnings from transient third-party deps. This keeps CI logs
+      # focused and reduces noise while we plan dependency upgrades.
+      NODE_OPTIONS: "--max_old_space_size=4096 --no-deprecation"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests (try TEST_MUI_MOCKS, fallback to normal)
+        env:
+          CI: true
+        run: |
+          chmod +x ./scripts/ci-test.sh
+          ./scripts/ci-test.sh
+
+      - name: Build
+        run: npm run build

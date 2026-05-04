@@ -1,0 +1,84 @@
+---
+version: '3.8'
+
+services:
+  # Banco de dados MySQL (Produção)
+  mysql:
+    image: mysql:8.0
+    container_name: idebrasil_mysql_prod
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: idebrasil_platform
+      MYSQL_USER: idebrasil_user
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - idebrasil_network_prod
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Backend Node.js + Express (Produção)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: idebrasil_backend_prod
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DB_HOST: mysql
+      DB_USER: idebrasil_user
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: idebrasil_platform
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - mysql
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - idebrasil_network_prod
+
+  # Frontend React (Produção)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: idebrasil_frontend_prod
+    restart: unless-stopped
+    environment:
+      REACT_APP_API_URL: ${REACT_APP_API_URL}
+    depends_on:
+      - backend
+    networks:
+      - idebrasil_network_prod
+
+  # Nginx (Reverse Proxy - Produção)
+  nginx:
+    image: nginx:alpine
+    container_name: idebrasil_nginx_prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.prod.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+      - ./docker/nginx/logs:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - idebrasil_network_prod
+
+volumes:
+  mysql_prod_data:
+
+networks:
+  idebrasil_network_prod:
+    driver: bridge

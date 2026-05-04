@@ -1,0 +1,76 @@
+Home do site poseur um filter de estate e cicada
+
+
+Nome
+email
+cellular
+cpf
+
+Dados da empress
+Rasao social
+Nome fantasia
+CNPJ
+Endereço / divider
+
+Telephone
+E-mail
+Website
+instagram
+
+Descricao do Servico 
+
+Ramo de tai
+select - comercio, industrial, prestacao de service
+Fazer um filter para para as subcategories com base no ram de atuacao
+
+Select - Categorias
+
+local de upload 
+
+
+
+Dash Board - 
+total de empress for seguimento, reggae, asset 
+Controle de publicacao 
+
+Enviar mensagem para ajustes caso seja desaprovado 
+
+
+
+Reuniao 07-04
+Busca sera realized for : 
+Nome, Categoria, Cidade, Estado, e adicionar um select com subcategories; 
+
+
+No cadastro da empresa : precisamos validar com a base de dados que me sera passed, se o aluno é ou nao aluno do IDEBRASIL, SE SIM TRAZER A VALIDAÇAO DOS DADOS PARA QUE ELE POSSA SER EXIBIDO PARA O ALUNO E APOS ISSO REDIRECIONA-LO PARA O SEU PERFIL, 
+
+FLUXO NAO - CPF NAO ENCONTRADO EM NOSSA BASE DE DADOS
+
+OLÁ ESTOU TENTANDO CADASTRAR MINHA EMPRESA NA PLATAFORMA DE CLASSSIFICADOS DO IDEBRASIL, POREM CONSTA QUE MEU CPF NAO ESTÁ CADASTRADO, COMO DEVO PROCEDER! 
+
+
+dash Board Administrator: 
+Verificadas | Pendente Verificacao | 
+
+REuniao 13-04-2026
+
+Remover do filter as palavers todos : 
+Buscar...
+
+Remover no cadastro A SENHA
+NA SEGUNDA ETAPA DO FORM, 
+APLICAR NO NOME UMA MASCARA ONDE SEMPRE A PRIMEIRA APOS ESPACO É MAIUSCULA; 
+
+Alterar URL external para upload direto no formulário. 
+
+Na ultima etapada do cadastre adiconar mascara na url do campo do website; 
+
+Remover imagem do serviço; 
+No campos descriçao alterar para, Descricao da empress; 
+
+Adicionar logo da empresa; 
+
+Manter padronizado a navbar com a logo e o nome do projeto; 
+
+
+

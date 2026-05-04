@@ -1,0 +1,25 @@
+# Development Dockerfile - mais rápido para desenvolvimento
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install ALL dependencies (including dev dependencies)
+RUN npm install
+
+# Copy config files
+COPY tsconfig.json ./
+
+# Copy source code
+COPY src/ ./src/
+
+# Build TypeScript
+RUN npm run build
+
+# Expose port
+EXPOSE 3001
+
+# Default command - run built version
+CMD ["npm", "run", "start"]
