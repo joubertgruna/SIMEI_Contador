@@ -1,0 +1,45 @@
+---
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: idebrasil_platform
+      MYSQL_USER: idebrasil
+      MYSQL_PASSWORD: idebrasilpass
+    ports:
+      - '3307:3306'
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: db
+      DB_USER: idebrasil
+      DB_PASSWORD: idebrasilpass
+      DB_NAME: idebrasil_platform
+      PORT: 3001
+      NODE_ENV: development
+    ports:
+      - '3001:3001'
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      REACT_APP_API_URL: /api
+    ports:
+      - '3000:80'
+    depends_on:
+      - backend
+
+volumes:
+  db-data:
+    driver: local

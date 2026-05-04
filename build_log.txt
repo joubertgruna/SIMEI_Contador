@@ -1,0 +1,8 @@
+Need to install the following packages:
+react-scripts@5.0.1
+Ok to proceed? (y) 
+npm error code EIO
+npm error syscall read
+npm error errno -5
+npm error read EIO
+npm error A complete log of this run can be found in: /Users/joubertgabriel/.npm/_logs/2026-04-26T05_23_44_089Z-debug-0.log

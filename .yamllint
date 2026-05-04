@@ -1,0 +1,16 @@
+---
+extends: default
+
+# Ignore files in node_modules
+ignore: |
+  **/node_modules/**
+
+rules:
+  # Allow truthy values in CI workflows (GitHub Actions uses some keys that look "truthy")
+  truthy: disable
+  # GitHub Actions comments may not align with indentation; relax this rule
+  comments-indentation: disable
+  # Allow longer lines (some URLs and comments may be long)
+  line-length:
+    max: 120
+    level: warning
