@@ -18,6 +18,7 @@ import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, UserType } from '../../contexts/AuthContext';
 import { authService } from '../../services/authService';
+import { maskCPF, maskPhoneBR, normalizeEmail, normalizeName } from '../../utils/inputMasks';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -56,6 +57,29 @@ const RegisterForm: React.FC = () => {
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
+
+  const handleFormattedChange = (field: string, value: string) => {
+    let formattedValue = value;
+
+    switch (field) {
+      case 'nome':
+        formattedValue = normalizeName(value);
+        break;
+      case 'email':
+        formattedValue = normalizeEmail(value);
+        break;
+      case 'telefone':
+        formattedValue = maskPhoneBR(value);
+        break;
+      case 'cpf':
+        formattedValue = maskCPF(value);
+        break;
+      default:
+        break;
+    }
+
+    formik.setFieldValue(field, formattedValue);
+  };
 
   const getUserType = (index: number): UserType => {
     switch (index) {
@@ -205,7 +229,7 @@ const RegisterForm: React.FC = () => {
                 name="nome"
                 label="Nome Completo"
                 value={formik.values.nome}
-                onChange={formik.handleChange}
+                onChange={(e) => handleFormattedChange('nome', e.target.value)}
                 onBlur={formik.handleBlur}
                 error={formik.touched.nome && Boolean(formik.errors.nome)}
                 helperText={formik.touched.nome && formik.errors.nome}
@@ -225,7 +249,7 @@ const RegisterForm: React.FC = () => {
                 name="cpf"
                 label="CPF"
                 value={formik.values.cpf}
-                onChange={formik.handleChange}
+                onChange={(e) => handleFormattedChange('cpf', e.target.value)}
                 onBlur={formik.handleBlur}
                 error={formik.touched.cpf && Boolean(formik.errors.cpf)}
                 helperText={formik.touched.cpf && formik.errors.cpf}
@@ -258,7 +282,7 @@ const RegisterForm: React.FC = () => {
                 name="nome"
                 label="Nome da Empresa"
                 value={formik.values.nome}
-                onChange={formik.handleChange}
+                onChange={(e) => handleFormattedChange('nome', e.target.value)}
                 onBlur={formik.handleBlur}
                 error={formik.touched.nome && Boolean(formik.errors.nome)}
                 helperText={formik.touched.nome && formik.errors.nome}
@@ -280,7 +304,7 @@ const RegisterForm: React.FC = () => {
               label="Email"
               type="email"
               value={formik.values.email}
-              onChange={formik.handleChange}
+              onChange={(e) => handleFormattedChange('email', e.target.value)}
               onBlur={formik.handleBlur}
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
@@ -300,7 +324,7 @@ const RegisterForm: React.FC = () => {
               name="telefone"
               label="Telefone"
               value={formik.values.telefone}
-              onChange={formik.handleChange}
+              onChange={(e) => handleFormattedChange('telefone', e.target.value)}
               onBlur={formik.handleBlur}
               error={formik.touched.telefone && Boolean(formik.errors.telefone)}
               helperText={formik.touched.telefone && formik.errors.telefone}

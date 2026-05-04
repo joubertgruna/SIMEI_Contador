@@ -30,6 +30,7 @@ import {
   Error,
 } from '@mui/icons-material';
 import { empresaService, Empresa, Categoria, Subcategoria } from '../services/empresaService';
+import { maskCEP, maskCNPJ, maskCPF, maskPhoneBR, normalizeEmail, normalizeName, normalizeText } from '../utils/inputMasks';
 
 const steps = [
   'Dados Pessoais',
@@ -166,11 +167,43 @@ const EmpresaCadastro: React.FC = () => {
     }
   };
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const formatFieldValue = (field: string, value: any) => {
+    if (typeof value !== 'string') return value;
 
-    if (field === 'cpf' && value.length >= 14) {
-      validarCPF(value);
+    switch (field) {
+      case 'nome':
+      case 'razao_social':
+      case 'nome_fantasia':
+        return normalizeName(value);
+      case 'email':
+      case 'email_empresa':
+        return normalizeEmail(value);
+      case 'cpf':
+        return maskCPF(value);
+      case 'cnpj':
+        return maskCNPJ(value);
+      case 'celular':
+      case 'telefone':
+        return maskPhoneBR(value);
+      case 'cep':
+        return maskCEP(value);
+      case 'endereco':
+      case 'bairro':
+      case 'cidade':
+        return normalizeText(value);
+      case 'estado':
+        return value.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 2);
+      default:
+        return value;
+    }
+  };
+
+  const handleInputChange = (field: string, value: any) => {
+    const formatted = formatFieldValue(field, value);
+    setFormData(prev => ({ ...prev, [field]: formatted }));
+
+    if (field === 'cpf' && typeof formatted === 'string' && formatted.length >= 14) {
+      validarCPF(formatted);
     }
   };
 
@@ -223,19 +256,6 @@ const EmpresaCadastro: React.FC = () => {
     } catch (err) {
       console.error('Erro ao consultar CEP:', err);
     }
-  };
-
-  const titleCaseWords = (value: string) => {
-    // List of acronyms and exceptions to preserve
-    const exceptions = new Set(['IDEBRASIL', 'CNPJ', 'CPF', 'MEI', 'PJ', 'PF', 'LTDA', 'SA']);
-    return value
-      .split(' ')
-      .map(word => {
-        if (!word) return '';
-        if (exceptions.has(word.toUpperCase())) return word.toUpperCase();
-        return word[0].toUpperCase() + word.slice(1).toLowerCase();
-      })
-      .join(' ');
   };
 
   const handleWebsiteBlur = () => {
@@ -330,22 +350,6 @@ const EmpresaCadastro: React.FC = () => {
     }
   };
 
-  const formatarCPF = (value: string) => {
-    const cpf = value.replace(/\D/g, '');
-    if (cpf.length <= 11) {
-      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-    }
-    return value;
-  };
-
-  const formatarCNPJ = (value: string) => {
-    const cnpj = value.replace(/\D/g, '');
-    if (cnpj.length <= 14) {
-      return cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
-    }
-    return value;
-  };
-
   const renderStepContent = (step: number) => {
     switch (step) {
       case 0:
@@ -363,7 +367,7 @@ const EmpresaCadastro: React.FC = () => {
                 fullWidth
                 label="Nome Completo"
                 value={formData.nome}
-                onChange={(e) => handleInputChange('nome', titleCaseWords(e.target.value))}
+                onChange={(e) => handleInputChange('nome', e.target.value)}
                 required
               />
             </Grid>
@@ -395,7 +399,7 @@ const EmpresaCadastro: React.FC = () => {
                 fullWidth
                 label="CPF"
                 value={formData.cpf}
-                onChange={(e) => handleInputChange('cpf', formatarCPF(e.target.value))}
+                onChange={(e) => handleInputChange('cpf', e.target.value)}
                 placeholder="000.000.000-00"
                 required
                 error={validation.cpfValid === false}
@@ -435,7 +439,7 @@ const EmpresaCadastro: React.FC = () => {
                 fullWidth
                 label="Razão Social"
                 value={formData.razao_social}
-                onChange={(e) => handleInputChange('razao_social', titleCaseWords(e.target.value))}
+                onChange={(e) => handleInputChange('razao_social', e.target.value)}
                 required
               />
             </Grid>
@@ -445,7 +449,7 @@ const EmpresaCadastro: React.FC = () => {
                 fullWidth
                 label="Nome Fantasia"
                 value={formData.nome_fantasia}
-                onChange={(e) => handleInputChange('nome_fantasia', titleCaseWords(e.target.value))}
+                onChange={(e) => handleInputChange('nome_fantasia', e.target.value)}
               />
             </Grid>
 
@@ -454,7 +458,7 @@ const EmpresaCadastro: React.FC = () => {
                 fullWidth
                 label="CNPJ"
                 value={formData.cnpj}
-                onChange={(e) => handleInputChange('cnpj', formatarCNPJ(e.target.value))}
+                onChange={(e) => handleInputChange('cnpj', e.target.value)}
                 placeholder="00.000.000/0000-00"
                 required
               />

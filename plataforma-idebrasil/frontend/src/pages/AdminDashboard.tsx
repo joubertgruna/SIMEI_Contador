@@ -69,6 +69,7 @@ import {
 } from '@mui/icons-material';
 import { adminService, EmpresaStats, AdminEmpresa } from '../services/adminService';
 import Relatorios from './Relatorios';
+import { maskCEP, maskCNPJ, maskCPF, maskPhoneBR, normalizeEmail, normalizeName, normalizeText } from '../utils/inputMasks';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -191,6 +192,59 @@ const AdminDashboard: React.FC = () => {
   const [alunoEditId, setAlunoEditId] = useState<number | null>(null);
   const [alunoFormLoading, setAlunoFormLoading] = useState(false);
   const [excluirAlunoConfirm, setExcluirAlunoConfirm] = useState<Aluno | null>(null);
+
+  const formatFieldValue = (field: string, value: any) => {
+    if (typeof value !== 'string') return value;
+
+    switch (field) {
+      case 'nome':
+      case 'razao_social':
+      case 'nome_fantasia':
+        return normalizeName(value);
+      case 'email':
+      case 'email_empresa':
+        return normalizeEmail(value);
+      case 'cpf':
+        return maskCPF(value);
+      case 'cnpj':
+        return maskCNPJ(value);
+      case 'telefone':
+      case 'celular':
+        return maskPhoneBR(value);
+      case 'cep':
+        return maskCEP(value);
+      case 'endereco':
+      case 'bairro':
+      case 'cidade':
+      case 'curso':
+      case 'turma':
+        return normalizeText(value);
+      case 'estado':
+        return value.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 2);
+      default:
+        return value;
+    }
+  };
+
+  const setAlunoFormField = (field: string, value: any) => {
+    setAlunoForm((prev) => ({ ...prev, [field]: formatFieldValue(field, value) }));
+  };
+
+  const setEditEmpresaField = (field: string, value: any) => {
+    setEditEmpresaData((prev) => ({ ...prev, [field]: formatFieldValue(field, value) }));
+  };
+
+  const setEditUsuarioField = (field: string, value: any) => {
+    setEditUsuarioData((prev) => ({ ...prev, [field]: formatFieldValue(field, value) }));
+  };
+
+  const setNovaEmpresaField = (field: string, value: any) => {
+    setNovaEmpresaData((prev) => ({ ...prev, [field]: formatFieldValue(field, value) }));
+  };
+
+  const setNovoUsuarioField = (field: string, value: any) => {
+    setNovoUsuarioData((prev) => ({ ...prev, [field]: formatFieldValue(field, value) }));
+  };
 
   useEffect(() => {
     carregarDashboard();
@@ -1234,28 +1288,28 @@ const AdminDashboard: React.FC = () => {
           <Grid container spacing={2} sx={{ mt: 0.5 }}>
             <Grid item xs={12} sm={8}>
               <TextField fullWidth label="Nome completo *" value={alunoForm.nome}
-                onChange={e => setAlunoForm(f => ({ ...f, nome: e.target.value }))} />
+                onChange={e => setAlunoFormField('nome', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={4}>
               <TextField fullWidth label="CPF *" value={alunoForm.cpf}
-                onChange={e => setAlunoForm(f => ({ ...f, cpf: e.target.value }))}
+                onChange={e => setAlunoFormField('cpf', e.target.value)}
                 placeholder="000.000.000-00" />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth label="Email" value={alunoForm.email}
-                onChange={e => setAlunoForm(f => ({ ...f, email: e.target.value }))} />
+                onChange={e => setAlunoFormField('email', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth label="Telefone" value={alunoForm.telefone}
-                onChange={e => setAlunoForm(f => ({ ...f, telefone: e.target.value }))} />
+                onChange={e => setAlunoFormField('telefone', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth label="Curso" value={alunoForm.curso}
-                onChange={e => setAlunoForm(f => ({ ...f, curso: e.target.value }))} />
+                onChange={e => setAlunoFormField('curso', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={3}>
               <TextField fullWidth label="Turma" value={alunoForm.turma}
-                onChange={e => setAlunoForm(f => ({ ...f, turma: e.target.value }))} />
+                onChange={e => setAlunoFormField('turma', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={3}>
               <FormControl fullWidth>
@@ -1441,17 +1495,17 @@ const AdminDashboard: React.FC = () => {
               <Grid item xs={12} md={6}>
                 <TextField fullWidth size="small" label="Razão Social"
                   value={editEmpresaData.razao_social || ''}
-                  onChange={e => setEditEmpresaData(p => ({ ...p, razao_social: e.target.value }))} />
+                  onChange={e => setEditEmpresaField('razao_social', e.target.value)} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField fullWidth size="small" label="Nome Fantasia"
                   value={editEmpresaData.nome_fantasia || ''}
-                  onChange={e => setEditEmpresaData(p => ({ ...p, nome_fantasia: e.target.value }))} />
+                  onChange={e => setEditEmpresaField('nome_fantasia', e.target.value)} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField fullWidth size="small" label="CNPJ"
                   value={editEmpresaData.cnpj || ''}
-                  onChange={e => setEditEmpresaData(p => ({ ...p, cnpj: e.target.value }))} />
+                  onChange={e => setEditEmpresaField('cnpj', e.target.value)} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth size="small">
@@ -1471,28 +1525,28 @@ const AdminDashboard: React.FC = () => {
               <Grid item xs={12} md={6}>
                 <TextField fullWidth size="small" label="Endereço"
                   value={editEmpresaData.endereco || ''}
-                  onChange={e => setEditEmpresaData(p => ({ ...p, endereco: e.target.value }))} />
+                  onChange={e => setEditEmpresaField('endereco', e.target.value)} />
               </Grid>
               <Grid item xs={6} md={3}>
                 <TextField fullWidth size="small" label="Bairro"
                   value={editEmpresaData.bairro || ''}
-                  onChange={e => setEditEmpresaData(p => ({ ...p, bairro: e.target.value }))} />
+                  onChange={e => setEditEmpresaField('bairro', e.target.value)} />
               </Grid>
               <Grid item xs={6} md={3}>
                 <TextField fullWidth size="small" label="CEP"
                   value={editEmpresaData.cep || ''}
-                  onChange={e => setEditEmpresaData(p => ({ ...p, cep: e.target.value }))} />
+                  onChange={e => setEditEmpresaField('cep', e.target.value)} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField fullWidth size="small" label="Cidade"
                   value={editEmpresaData.cidade || ''}
-                  onChange={e => setEditEmpresaData(p => ({ ...p, cidade: e.target.value }))} />
+                  onChange={e => setEditEmpresaField('cidade', e.target.value)} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField fullWidth size="small" label="Estado (sigla)"
                   value={editEmpresaData.estado || ''}
                   inputProps={{ maxLength: 2 }}
-                  onChange={e => setEditEmpresaData(p => ({ ...p, estado: e.target.value.toUpperCase() }))} />
+                  onChange={e => setEditEmpresaField('estado', e.target.value)} />
               </Grid>
             </Grid>
             <Divider sx={{ my: 2 }} />
@@ -1501,12 +1555,12 @@ const AdminDashboard: React.FC = () => {
               <Grid item xs={12} md={6}>
                 <TextField fullWidth size="small" label="Telefone"
                   value={editEmpresaData.telefone || ''}
-                  onChange={e => setEditEmpresaData(p => ({ ...p, telefone: e.target.value }))} />
+                  onChange={e => setEditEmpresaField('telefone', e.target.value)} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField fullWidth size="small" label="E-mail da Empresa"
                   value={editEmpresaData.email_empresa || ''}
-                  onChange={e => setEditEmpresaData(p => ({ ...p, email_empresa: e.target.value }))} />
+                  onChange={e => setEditEmpresaField('email_empresa', e.target.value)} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField fullWidth size="small" label="Website"
@@ -1559,22 +1613,22 @@ const AdminDashboard: React.FC = () => {
             <Grid item xs={12}>
               <TextField fullWidth size="small" label="Nome Completo"
                 value={editUsuarioData.nome || ''}
-                onChange={e => setEditUsuarioData(p => ({ ...p, nome: e.target.value }))} />
+                onChange={e => setEditUsuarioField('nome', e.target.value)} />
             </Grid>
             <Grid item xs={12}>
               <TextField fullWidth size="small" label="E-mail" type="email"
                 value={editUsuarioData.email || ''}
-                onChange={e => setEditUsuarioData(p => ({ ...p, email: e.target.value }))} />
+                onChange={e => setEditUsuarioField('email', e.target.value)} />
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField fullWidth size="small" label="CPF"
                 value={editUsuarioData.cpf || ''}
-                onChange={e => setEditUsuarioData(p => ({ ...p, cpf: e.target.value }))} />
+                onChange={e => setEditUsuarioField('cpf', e.target.value)} />
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField fullWidth size="small" label="Telefone"
                 value={editUsuarioData.telefone || ''}
-                onChange={e => setEditUsuarioData(p => ({ ...p, telefone: e.target.value }))} />
+                onChange={e => setEditUsuarioField('telefone', e.target.value)} />
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth size="small">
@@ -1674,47 +1728,47 @@ const AdminDashboard: React.FC = () => {
           <Grid container spacing={2} sx={{ mt: 0.5 }}>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth size="small" label="Razão Social *" value={novaEmpresaData.razao_social}
-                onChange={e => setNovaEmpresaData(p => ({ ...p, razao_social: e.target.value }))} />
+                onChange={e => setNovaEmpresaField('razao_social', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth size="small" label="Nome Fantasia" value={novaEmpresaData.nome_fantasia}
-                onChange={e => setNovaEmpresaData(p => ({ ...p, nome_fantasia: e.target.value }))} />
+                onChange={e => setNovaEmpresaField('nome_fantasia', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth size="small" label="CNPJ *" value={novaEmpresaData.cnpj}
-                onChange={e => setNovaEmpresaData(p => ({ ...p, cnpj: e.target.value }))} placeholder="00.000.000/0001-00" />
+                onChange={e => setNovaEmpresaField('cnpj', e.target.value)} placeholder="00.000.000/0001-00" />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth size="small" label="CPF do Responsável *" value={novaEmpresaData.cpf}
-                onChange={e => setNovaEmpresaData(p => ({ ...p, cpf: e.target.value }))} placeholder="000.000.000-00" />
+                onChange={e => setNovaEmpresaField('cpf', e.target.value)} placeholder="000.000.000-00" />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth size="small" label="E-mail da Empresa" value={novaEmpresaData.email_empresa}
-                onChange={e => setNovaEmpresaData(p => ({ ...p, email_empresa: e.target.value }))} />
+                onChange={e => setNovaEmpresaField('email_empresa', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth size="small" label="Telefone" value={novaEmpresaData.telefone}
-                onChange={e => setNovaEmpresaData(p => ({ ...p, telefone: e.target.value }))} />
+                onChange={e => setNovaEmpresaField('telefone', e.target.value)} />
             </Grid>
             <Grid item xs={12}>
               <TextField fullWidth size="small" label="Endereço" value={novaEmpresaData.endereco}
-                onChange={e => setNovaEmpresaData(p => ({ ...p, endereco: e.target.value }))} />
+                onChange={e => setNovaEmpresaField('endereco', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={4}>
               <TextField fullWidth size="small" label="Bairro" value={novaEmpresaData.bairro}
-                onChange={e => setNovaEmpresaData(p => ({ ...p, bairro: e.target.value }))} />
+                onChange={e => setNovaEmpresaField('bairro', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={4}>
               <TextField fullWidth size="small" label="Cidade" value={novaEmpresaData.cidade}
-                onChange={e => setNovaEmpresaData(p => ({ ...p, cidade: e.target.value }))} />
+                onChange={e => setNovaEmpresaField('cidade', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={2}>
               <TextField fullWidth size="small" label="Estado (UF)" value={novaEmpresaData.estado}
-                onChange={e => setNovaEmpresaData(p => ({ ...p, estado: e.target.value.toUpperCase().slice(0, 2) }))} />
+                onChange={e => setNovaEmpresaField('estado', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={2}>
               <TextField fullWidth size="small" label="CEP" value={novaEmpresaData.cep}
-                onChange={e => setNovaEmpresaData(p => ({ ...p, cep: e.target.value }))} />
+                onChange={e => setNovaEmpresaField('cep', e.target.value)} />
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth size="small">
@@ -1775,11 +1829,11 @@ const AdminDashboard: React.FC = () => {
           <Grid container spacing={2} sx={{ mt: 0.5 }}>
             <Grid item xs={12}>
               <TextField fullWidth size="small" label="Nome completo *" value={novoUsuarioData.nome}
-                onChange={e => setNovoUsuarioData(p => ({ ...p, nome: e.target.value }))} />
+                onChange={e => setNovoUsuarioField('nome', e.target.value)} />
             </Grid>
             <Grid item xs={12}>
               <TextField fullWidth size="small" label="E-mail *" type="email" value={novoUsuarioData.email}
-                onChange={e => setNovoUsuarioData(p => ({ ...p, email: e.target.value }))} />
+                onChange={e => setNovoUsuarioField('email', e.target.value)} />
             </Grid>
             <Grid item xs={12}>
               <TextField fullWidth size="small" label="Senha *" type="password" value={novoUsuarioData.senha}
@@ -1788,11 +1842,11 @@ const AdminDashboard: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth size="small" label="CPF" value={novoUsuarioData.cpf}
-                onChange={e => setNovoUsuarioData(p => ({ ...p, cpf: e.target.value }))} placeholder="000.000.000-00" />
+                onChange={e => setNovoUsuarioField('cpf', e.target.value)} placeholder="000.000.000-00" />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth size="small" label="Telefone" value={novoUsuarioData.telefone}
-                onChange={e => setNovoUsuarioData(p => ({ ...p, telefone: e.target.value }))} />
+                onChange={e => setNovoUsuarioField('telefone', e.target.value)} />
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth size="small">

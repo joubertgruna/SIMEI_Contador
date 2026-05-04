@@ -19,6 +19,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../../contexts/AuthContext';
 import { authService } from '../../services/authService';
+import { maskCNPJ, maskCPF, maskPhoneBR, normalizeEmail, normalizeName } from '../../utils/inputMasks';
 
 const UserProfile: React.FC = () => {
   const { state, updateProfile, clearError } = useAuth();
@@ -82,6 +83,36 @@ const UserProfile: React.FC = () => {
     setIsEditing(false);
     formik.resetForm();
     clearError();
+  };
+
+  const handleFormattedChange = (field: string, value: string) => {
+    let formatted = value;
+
+    switch (field) {
+      case 'nome':
+        formatted = normalizeName(value);
+        break;
+      case 'email':
+        formatted = normalizeEmail(value);
+        break;
+      case 'telefone':
+        formatted = maskPhoneBR(value);
+        break;
+      case 'cpf':
+        formatted = maskCPF(value);
+        break;
+      case 'cnpj':
+        formatted = maskCNPJ(value);
+        break;
+      case 'razao_social':
+      case 'nome_fantasia':
+        formatted = normalizeName(value);
+        break;
+      default:
+        break;
+    }
+
+    formik.setFieldValue(field, formatted);
   };
 
   // Formik para troca de senha
@@ -186,7 +217,7 @@ const UserProfile: React.FC = () => {
                   name="nome"
                   label="Nome Completo"
                   value={formik.values.nome}
-                  onChange={formik.handleChange}
+                  onChange={(e) => handleFormattedChange('nome', e.target.value)}
                   onBlur={formik.handleBlur}
                   error={formik.touched.nome && Boolean(formik.errors.nome)}
                   helperText={formik.touched.nome && formik.errors.nome}
@@ -209,7 +240,7 @@ const UserProfile: React.FC = () => {
                   label="Email"
                   type="email"
                   value={formik.values.email}
-                  onChange={formik.handleChange}
+                  onChange={(e) => handleFormattedChange('email', e.target.value)}
                   onBlur={formik.handleBlur}
                   error={formik.touched.email && Boolean(formik.errors.email)}
                   helperText={formik.touched.email && formik.errors.email}
@@ -231,7 +262,7 @@ const UserProfile: React.FC = () => {
                   name="telefone"
                   label="Telefone"
                   value={formik.values.telefone}
-                  onChange={formik.handleChange}
+                  onChange={(e) => handleFormattedChange('telefone', e.target.value)}
                   onBlur={formik.handleBlur}
                   error={formik.touched.telefone && Boolean(formik.errors.telefone)}
                   helperText={formik.touched.telefone && formik.errors.telefone}
@@ -255,7 +286,7 @@ const UserProfile: React.FC = () => {
                     name="cpf"
                     label="CPF"
                     value={formik.values.cpf}
-                    onChange={formik.handleChange}
+                    onChange={(e) => handleFormattedChange('cpf', e.target.value)}
                     onBlur={formik.handleBlur}
                     error={formik.touched.cpf && Boolean(formik.errors.cpf)}
                     helperText={formik.touched.cpf && formik.errors.cpf}
@@ -281,7 +312,7 @@ const UserProfile: React.FC = () => {
                       name="cnpj"
                       label="CNPJ"
                       value={formik.values.cnpj}
-                      onChange={formik.handleChange}
+                      onChange={(e) => handleFormattedChange('cnpj', e.target.value)}
                       onBlur={formik.handleBlur}
                       error={formik.touched.cnpj && Boolean(formik.errors.cnpj)}
                       helperText={formik.touched.cnpj && formik.errors.cnpj}
@@ -304,7 +335,7 @@ const UserProfile: React.FC = () => {
                       name="razao_social"
                       label="Razão Social"
                       value={formik.values.razao_social}
-                      onChange={formik.handleChange}
+                      onChange={(e) => handleFormattedChange('razao_social', e.target.value)}
                       onBlur={formik.handleBlur}
                       error={formik.touched.razao_social && Boolean(formik.errors.razao_social)}
                       helperText={formik.touched.razao_social && formik.errors.razao_social}
@@ -326,7 +357,7 @@ const UserProfile: React.FC = () => {
                       name="nome_fantasia"
                       label="Nome Fantasia"
                       value={formik.values.nome_fantasia}
-                      onChange={formik.handleChange}
+                      onChange={(e) => handleFormattedChange('nome_fantasia', e.target.value)}
                       onBlur={formik.handleBlur}
                       error={formik.touched.nome_fantasia && Boolean(formik.errors.nome_fantasia)}
                       helperText={formik.touched.nome_fantasia && formik.errors.nome_fantasia}
